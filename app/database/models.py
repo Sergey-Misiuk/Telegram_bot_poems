@@ -25,20 +25,20 @@ class User(Base):
     tg_id = mapped_column(BigInteger)
 
 
-class Author(Base):
-    __tablename__ = "authors"
+# class Author(Base):
+#     __tablename__ = "authors"
     
-    id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(50))
+#     id: Mapped[int] = mapped_column(primary_key=True)
+#     name: Mapped[str] = mapped_column(String(50))
 
 
-class Poems(Base):
+class Poem(Base):
     __tablename__ = "poems"
 
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(30))
-    text: Mapped[str] = mapped_column(String(500))
-    author: Mapped[int] = mapped_column(ForeignKey("authors.id"))
+    text: Mapped[str] = mapped_column(String(1000))
+    author: Mapped[int] = mapped_column(String(500))
     
 
 class Favourite(Base):
