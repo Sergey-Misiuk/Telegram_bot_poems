@@ -18,7 +18,7 @@ async def cmd_start(message: Message):
 async def random_poetry(message: Message):
     set_poetry = await rq.get_random_poetry()
     await message.answer(
-        f"Стих\n\n{set_poetry['author']}\n\n{set_poetry['poem_name']}\n\n{set_poetry['poem_text']}",
+        f"Стих\n\n{set_poetry.author}\n\n{set_poetry.title}\n\n{set_poetry.text}",
         reply_markup=await kb.poetry(),
     )
 
@@ -29,6 +29,11 @@ async def get_personal_poetry(message: Message):
 
 
 @router.callback_query(F.data.startswith("to_favourite"))
-async def category(callback: CallbackQuery):
-    print(callback.message.text.split('\n'))   # type: ignore
+async def add_poetry(callback: CallbackQuery):
+    s = callback.message.text.split('\n')  # type: ignore
+    print(f'{s[2]}    ----   {s[4]}')
+    print(callback.message.text)   # type: ignore
+    print()   # type: ignore
+    # print(callback.message.text.replace('', ' '))   # type: ignore
+    # await rq.set_poetry(callback.message.from_user.id, callback.message.text)
     await callback.answer("Стих добавлен в избранные!")

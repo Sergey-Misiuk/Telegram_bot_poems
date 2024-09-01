@@ -1,9 +1,9 @@
+import logging
 from typing import Any
-from app.database.models import async_session, User
+from app.database.models import async_session, Favourite, Poem, User
 from sqlalchemy import select
-from bs4 import BeautifulSoup
-import requests
-from random import randint
+
+from app.functions import parser_poetry
 
 
 async def set_user(tg_id: Any):
@@ -16,37 +16,22 @@ async def set_user(tg_id: Any):
 
 
 async def get_random_poetry():
-    source = "https://www.culture.ru/literature/poems"
-    source_domain = "https://www.culture.ru"
-    response = requests.get(source)
-    html = BeautifulSoup(response.text, "lxml")
-    qty_pages = html.find("div", class_="W6UA5").find_all("a")
-    random_page = randint(1, int(qty_pages[2].get_text()))
-    url = f"https://www.culture.ru/literature/poems?page={random_page}"
-    response = requests.get(url)
-    html = BeautifulSoup(response.text, "lxml")
-    poem_links = html.find_all("div", class_="Dx0ke")
-    random_poem = randint(0, len(poem_links) - 1)
-    poem_link = poem_links[random_poem].find("a", class_="ICocV").get("href")
-    url = f"{source_domain}{poem_link}"
-    response = requests.get(url)
-    html = BeautifulSoup(response.text, "lxml")
-    author = html.select_one("div.HjkFX").get_text()
-    poem_name = html.select_one("div.rrWFt").get_text()
-    poem_paragraphs = html.select("div.xZmPc")
-    poem_text = []
+    random_poetry = await parser_poetry()
+    async with async_session() as session:
+        poem = await session.scalar(select(Poem).where(Poem.author == random_poetry.author, Poem.title == random_poetry.title))
 
-    for paragraph in poem_paragraphs[0]:
-        poem_text.append(
-            str(paragraph)
-            .replace(f'<div class="VKUQz" data-author-title="{author}">', "")
-            .replace('<div class="JIu28">', "")
-            .replace('<div class="" data-content="text">', "")
-            .replace("<!-- -->", "")
-            .replace("</div>", "")
-            .replace("<br/>", "\n")
-            .replace("<p>", "")
-            .replace("</p>", "")
-        )
-    poem_text = "\n\n".join(poem_text)
-    return {"author": author, "poem_name": poem_name, "poem_text": poem_text}
+        if not poem:
+            logging.info('Стих отсутствует в базе данных, добавляю в базу')
+            session.add(Poem(author=random_poetry.author, title=random_poetry.title, text=random_poetry.text))
+            await session.commit()
+            return random_poetry
+        logging.info('Стих взят из базы данных')
+        return poem
+
+
+async def set_poetry(tg_id, poetry):
+    async with async_session() as session:
+        user = await session.scalar(select(User).where(User.tg_id == tg_id))
+        poem = await session.scalar(select(Poem).where(Poem.title == poetry))
+        session.add(Favourite(poem=poem.id, user=user.id))
+        await session.commit()
