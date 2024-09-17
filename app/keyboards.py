@@ -5,14 +5,14 @@ from aiogram.types import (
 )
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from app.database.requests import get_favourite_poetry
+from app.database.requests import get_favourite_poetry, get_personal_poetry
 
 main = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Случайный стих")],
         [KeyboardButton(text="Авторский стих")],
         [KeyboardButton(text="Список избранных стихов")],
-        [KeyboardButton(text="Оставить отзыв"), KeyboardButton(text="О нас")],
+        # [KeyboardButton(text="Оставить отзыв"), KeyboardButton(text="О нас")],
     ],
     resize_keyboard=True,
     input_field_placeholder="Выбирите пункт из меню...",
@@ -48,6 +48,20 @@ async def poems(tg_id):
             InlineKeyboardButton(
                 text=f'"{poem.poem_info.title}" - {poem.poem_info.author}',
                 callback_data=f"poem_{poem.poem_id}",
+            )
+        )
+    return keyboard.adjust(1).as_markup()
+
+
+async def personal_poems():
+    poems = await get_personal_poetry()
+    keyboard = InlineKeyboardBuilder()
+
+    for poem in poems:
+        keyboard.add(
+            InlineKeyboardButton(
+                text=f'"Стих {poem.title}" - {poem.author}',
+                callback_data=f"poem_{poem.id}",
             )
         )
     return keyboard.adjust(1).as_markup()

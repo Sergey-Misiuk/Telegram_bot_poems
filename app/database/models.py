@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 from typing import List
 from sqlalchemy import BigInteger, String, ForeignKey
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -8,7 +9,9 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-DB_URL: str = os.environ.get("DATABASE_URL")  # type: ignore
+load_dotenv()
+
+DB_URL: str = os.environ.get("DATABASE_URL")   # type:ignore
 
 engine = create_async_engine(url=DB_URL, echo=True)
 

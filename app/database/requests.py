@@ -45,6 +45,12 @@ async def add_or_del_fvourite_poetry(tg_id, poetry):
         poem = await session.scalar(
             select(Poem).where(Poem.title == poetry[4]).where(Poem.author == poetry[2])
         )
+        # print()
+        # print(poetry)
+        # print()
+        # print(poem)
+        # print()
+        # print()
         favorite_poem = await session.scalar(
             select(Favourite)
             .where(Favourite.poem_id == poem.id)
@@ -72,6 +78,24 @@ async def get_favourite_poetry(tg_id):
         return poems
 
 
+async def get_personal_poetry():
+    async with async_session() as session:
+        poems = await session.scalars(select(Poem).where(Poem.author == "Авторский"))
+
+        return poems
+
+
 async def get_poem(poem_id):
     async with async_session() as session:
         return await session.scalar(select(Poem).where(Poem.id == poem_id))
+
+
+async def exist_poem_db(poem_id, tg_id):
+    async with async_session() as session:
+        user = await session.scalar(select(User).where(User.tg_id == tg_id))
+        poems = await session.scalar(
+            select(Favourite)
+            .where(Favourite.user_id == user.id)
+            .where(Favourite.poem_id == poem_id)
+        )
+        return poems
