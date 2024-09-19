@@ -10,9 +10,33 @@ from app.database.requests import get_favourite_poetry, get_personal_poetry
 main = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Случайный стих")],
-        [KeyboardButton(text="Авторский стих")],
+        [KeyboardButton(text="Список авторских стихов")],
         [KeyboardButton(text="Список избранных стихов")],
         # [KeyboardButton(text="Оставить отзыв"), KeyboardButton(text="О нас")],
+    ],
+    resize_keyboard=True,
+    input_field_placeholder="Выбирите пункт из меню...",
+)
+
+admin_main = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="Случайный стих")],
+        [KeyboardButton(text="Список авторских стихов")],
+        [KeyboardButton(text="Список избранных стихов")],
+        [KeyboardButton(text="Админ панель")],
+        # [KeyboardButton(text="Оставить отзыв"), KeyboardButton(text="О нас")],
+    ],
+    resize_keyboard=True,
+    input_field_placeholder="Выбирите пункт из меню...",
+)
+
+
+admin_panel = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="Добавить стих")],
+        [KeyboardButton(text="Удалить стих")],
+        [KeyboardButton(text="Список авторских стихов")],
+        [KeyboardButton(text="На главную")],
     ],
     resize_keyboard=True,
     input_field_placeholder="Выбирите пункт из меню...",

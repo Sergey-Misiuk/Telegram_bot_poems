@@ -7,6 +7,7 @@ import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from app.middlewares import AccessMiddleware
 
 from app.handlers import router
 
@@ -23,6 +24,9 @@ async def main():
     bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
     dp = Dispatcher()
+    
+    # dp.message.middleware(AccessMiddleware())
+    
     dp.include_routers(router)
     dp.startup.register(startup)
     dp.shutdown.register(shutdown)
